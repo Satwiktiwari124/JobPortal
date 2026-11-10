@@ -1,0 +1,491 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <script>
+        (() => {
+            const token = sessionStorage.getItem("jwtToken");
+            const role = (sessionStorage.getItem("role") || "")
+                .trim()
+                .toUpperCase();
+
+            if (!token) {
+                window.location.replace("/login.html");
+                return;
+            }
+
+            // Recruiter should use the recruiter dashboard.
+            if (role === "RECRUITER" || role === "ROLE_RECRUITER") {
+                window.location.replace("/recruiter.html");
+                return;
+            }
+
+            // Only candidates (your current USER role) can access this page.
+            if (role !== "USER" && role !== "ROLE_USER") {
+                window.location.replace("/login.html");
+            }
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>JobPortal | Find Your Next Opportunity</title>
+    <meta name="description"
+          content="Discover job opportunities and find your next career move with JobPortal.">
+
+    <link rel="icon" type="image/png" href="/images/jobportal-logo.png">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top border-bottom">
+    <div class="container">
+
+        <!-- JobPortal Logo -->
+        <a class="navbar-brand fw-bold fs-4 d-inline-flex align-items-center gap-2"
+           href="/"
+           aria-label="JobPortal Home">
+
+            <img src="/images/jobportal-logo.png"
+                 alt="JobPortal logo"
+                 class="brand-logo">
+
+            <span>Job<span class="brand-highlight">Portal</span></span>
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+
+            <ul class="navbar-nav mx-auto gap-lg-3">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#jobs">Find Jobs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#how-it-works">How It Works</a>
+                </li>
+            </ul>
+
+            <!-- Guest Navbar -->
+            <div id="guestAuthLinks"
+                 class="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
+
+                <a href="/login.html"
+                   class="btn btn-outline-primary px-4">
+                    Login
+                </a>
+
+                <a href="/register.html"
+                   class="btn btn-primary px-4">
+                    Register
+                </a>
+            </div>
+
+            <!-- Logged-in User Navbar -->
+            <div id="userAuthLinks"
+                 class="d-none flex-column flex-lg-row align-items-lg-center gap-2 mt-3 mt-lg-0">
+
+                <span class="text-secondary px-lg-2">
+                    Welcome, <strong id="navUsername"></strong>
+                </span>
+
+                <!-- Recruiter-only Dashboard Link -->
+                <a href="/recruiter.html"
+                   id="navRecruiterLink"
+                   class="btn btn-outline-primary px-3 d-none">
+
+                    <i class="bi bi-speedometer2 me-1"></i>
+                    Dashboard
+                </a>
+
+                <button type="button"
+                        id="logoutBtn"
+                        class="btn btn-primary px-4">
+
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    Logout
+                </button>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+
+            <!-- Left side: Heading and Search -->
+            <div class="col-lg-7">
+
+                <span class="hero-badge">
+                    <i class="bi bi-stars me-2"></i>
+                    Your next opportunity starts here
+                </span>
+
+                <h1 class="hero-title mt-4">
+                    Find a job that
+                    <span>moves you forward.</span>
+                </h1>
+
+                <p class="hero-description mt-3">
+                    Discover opportunities, explore companies and take
+                    the next step in your professional journey.
+                </p>
+
+                <!-- Job Search -->
+                <form id="searchForm" class="search-panel mt-4">
+                    <div class="row g-3">
+
+                        <div class="col-md-5">
+                            <label for="keyword" class="form-label">
+                                Job title or company
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+
+                                <input type="text"
+                                       id="keyword"
+                                       class="form-control"
+                                       placeholder="Java Developer">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="location" class="form-label">
+                                Location
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-geo-alt"></i>
+                                </span>
+
+                                <input type="text"
+                                       id="location"
+                                       class="form-control"
+                                       placeholder="Noida">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit"
+                                    class="btn btn-primary w-100 search-button">
+                                Search
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <p class="hero-note mt-3">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Explore job listings in one place.
+                </p>
+
+            </div>
+
+            <!-- Right side: Career Illustration -->
+            <div class="col-lg-5">
+                <div class="hero-image-wrap">
+                    <img src="/images/career-hero.png"
+                         alt="Career opportunities, job listings and professional growth"
+                         class="hero-image">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Jobs Section -->
+<section class="jobs-section py-5" id="jobs">
+    <div class="container">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between
+                    align-items-md-end gap-3 mb-4">
+
+            <div>
+                <span class="section-eyebrow">CAREER OPPORTUNITIES</span>
+
+                <h2 class="section-title mt-2">
+                    Latest Job Listings
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    Explore openings from our job database.
+                </p>
+            </div>
+
+            <div class="job-count">
+                <i class="bi bi-briefcase me-2"></i>
+                <span id="jobCount">Loading...</span>
+            </div>
+
+        </div>
+
+        <!-- Loading / Error Messages -->
+        <div id="jobsMessage" class="jobs-message">
+            <div class="spinner-border text-primary me-2"
+                 role="status"
+                 aria-hidden="true"></div>
+
+            <span>Loading available jobs...</span>
+        </div>
+
+        <!-- Job cards inserted by app.js -->
+        <div class="row g-4" id="jobsGrid"></div>
+
+        <div class="text-center mt-4">
+            <button type="button"
+                    id="clearSearchBtn"
+                    class="btn btn-outline-primary px-4"
+                    hidden>
+                Clear Search
+            </button>
+        </div>
+
+    </div>
+</section>
+
+<!-- Candidate Dashboard: applications, resume and profile -->
+<section class="py-5 bg-light" id="candidateDashboard">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2 mb-4">
+            <div>
+                <span class="section-eyebrow">CANDIDATE WORKSPACE</span>
+                <h2 class="section-title mt-2">My Dashboard</h2>
+                <p class="text-secondary mb-0">Manage your profile, resume and job applications.</p>
+            </div>
+            <button class="btn btn-outline-primary" type="button" id="refreshApplicationsBtn">
+                <i class="bi bi-arrow-clockwise me-1"></i> Refresh Dashboard
+            </button>
+        </div>
+        <div id="candidateDashboardMessage" class="alert d-none" role="alert"></div>
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-person-circle me-2 text-primary"></i>My Profile</h5>
+                        <form id="profileForm">
+                            <div class="mb-3">
+                                <label class="form-label" for="profileUsername">Username</label>
+                                <input class="form-control" id="profileUsername" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="profileEmail">Email address</label>
+                                <input class="form-control" id="profileEmail" type="email" required>
+                            </div>
+                            <button class="btn btn-primary" type="submit" id="saveProfileBtn">Save Profile</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-pdf me-2 text-primary"></i>My Resume</h5>
+                        <p class="text-secondary">Upload a text-based PDF resume (maximum 5 MB).</p>
+                        <form id="resumeForm">
+                            <input class="form-control mb-3" id="resumeFile" type="file" accept="application/pdf,.pdf" required>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary" type="submit" id="uploadResumeBtn">Upload Resume</button>
+                                <button class="btn btn-outline-primary" type="button" id="downloadResumeBtn">Download My Resume</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-clipboard-check me-2 text-primary"></i>My Applications</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead><tr><th>Job</th><th>Company</th><th>Location</th><th>Applied On</th><th>Status</th></tr></thead>
+                        <tbody id="myApplicationsBody"><tr><td colspan="5" class="text-secondary">Loading applications...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-section py-5" id="how-it-works">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <span class="section-eyebrow">SIMPLE PROCESS</span>
+
+            <h2 class="section-title mt-2">
+                How JobPortal Works
+            </h2>
+
+            <p class="text-secondary">
+                Three simple steps towards your next opportunity.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="step-card h-100">
+                    <div class="step-icon">
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+
+                    <h5>Create an Account</h5>
+
+                    <p>
+                        Register for an account to get started with
+                        your job search.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="step-card h-100">
+                    <div class="step-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+
+                    <h5>Explore Opportunities</h5>
+
+                    <p>
+                        Browse available positions and find roles that
+                        match your interests.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="step-card h-100">
+                    <div class="step-icon">
+                        <i class="bi bi-rocket-takeoff"></i>
+                    </div>
+
+                    <h5>Take Your Next Step</h5>
+
+                    <p>
+                        Discover relevant opportunities and move
+                        forward in your career.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer py-4">
+    <div class="container">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between
+                    align-items-center gap-3">
+
+            <a class="footer-brand fw-bold fs-5 d-inline-flex align-items-center gap-2"
+               href="/">
+
+                <img src="/images/jobportal-logo.png"
+                     alt=""
+                     class="brand-logo brand-logo-footer">
+
+                <span>JobPortal</span>
+            </a>
+
+            <p class="mb-0">
+                Connecting talent with opportunity.
+            </p>
+
+            <span>
+                &copy; <span id="currentYear"></span> JobPortal
+            </span>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Existing Homepage JavaScript -->
+<script src="/js/app.js"></script>
+
+<!-- Navbar Authentication State -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const guestLinks = document.getElementById("guestAuthLinks");
+        const userLinks = document.getElementById("userAuthLinks");
+        const usernameElement = document.getElementById("navUsername");
+        const recruiterLink = document.getElementById("navRecruiterLink");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        const token = sessionStorage.getItem("jwtToken");
+        const username = sessionStorage.getItem("username");
+        const role = (
+            sessionStorage.getItem("role") || ""
+        ).toUpperCase();
+
+        const isLoggedIn = Boolean(token && username);
+
+        // Guest links: visible only when logged out
+        guestLinks.classList.toggle("d-none", isLoggedIn);
+        guestLinks.classList.toggle("d-flex", !isLoggedIn);
+
+        // User links: visible only when logged in
+        userLinks.classList.toggle("d-none", !isLoggedIn);
+        userLinks.classList.toggle("d-flex", isLoggedIn);
+
+        if (isLoggedIn) {
+            usernameElement.textContent = username;
+
+            const isRecruiter =
+                role === "ROLE_RECRUITER" ||
+                role === "RECRUITER";
+
+            recruiterLink.classList.toggle("d-none", !isRecruiter);
+        }
+
+        // Logout clears client-side session data
+        logoutBtn.addEventListener("click", function () {
+
+            sessionStorage.removeItem("jwtToken");
+            sessionStorage.removeItem("username");
+            sessionStorage.removeItem("role");
+
+            window.location.replace("/index.html");
+        });
+
+    });
+</script>
+
+</body>
+</html>
