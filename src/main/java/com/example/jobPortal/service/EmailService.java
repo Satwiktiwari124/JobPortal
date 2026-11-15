@@ -13,7 +13,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${MAIL_USERNAME}")
     private String fromEmail;
 
     public void sendApplicationConfirmation(
